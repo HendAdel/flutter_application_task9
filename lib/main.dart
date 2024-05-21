@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-//ToDo: fix the refrance error
-// import 'package:flutter_application_task9/models/user.dart';
+import 'package:flutter_application_task9/models/user.dart';
 
 void main() {
   runApp(MyApp());
@@ -14,6 +13,7 @@ class MyApp extends StatelessWidget {
   var passwordController = TextEditingController();
   var confirmPasswordController = TextEditingController();
   var formKey = GlobalKey<FormState>();
+  List<User> users = [];
 
 @override
   void dispose() {
@@ -27,64 +27,84 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(scaffoldBackgroundColor: Colors.orange),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Add User'),
+          // title: const Text('Add User'),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(8),
+        body:Padding(
+          padding: const EdgeInsets.all(20),
           child: Form(
             key: formKey,
-            child: Column(
-              children: [
-                textFields(
-                    label: 'E-mail',
-                    controller: emailController,
-                    validation: 'E-mail address',
-                    // icon: Icons.email,
-                    obscureText: false,
-                    keyboardType: TextInputType.emailAddress),
-                textFields(
-                    label: 'Username',
-                    controller: userNameController,
-                    validation: 'User name',
-                    // icon: Icons.person,
-                    obscureText: false,
-                    keyboardType: TextInputType.text),
-                textFields(
-                    label: 'Password',
-                    controller: passwordController,
-                    validation: 'password',
-                    //  icon: Icons.password,
-                    obscureText: true),
-                textFields(
-                    label: 'Confirm Password',
-                    controller: confirmPasswordController,
-                    validation: 'confirmed password',
-                    // icon: Icons.password,
-                    obscureText: true,
-                    textInputAction: TextInputAction.done),
-                    ElevatedButton(
-                              onPressed: () {
-                                if (formKey.currentState!.validate()) {
-                                  //ToDo: add the user to it's list
-
-                                  // users.add(user(
-                                  //     userNameController.text,
-                                  //     emailController.text,
-                                  //     passwordController.text,
-                                  //     confirmPasswordController.text));
-
-                                  // // to reset all text controllers
-                                  // userNameController.clear();
-                                  // emailController.clear();
-                                  // passwordController.clear();
-                                  // confirmPasswordController.clear();
-                                }
-                              },
-                              child: Text('Sigen UP')),
+            child: Container(color: Colors.blueGrey[50], height: 300,
+              child: Column(
+                
+                children: [
+                  textFields(
+                      label: 'E-mail',
+                      controller: emailController,
+                      validation: 'E-mail address',
+                      // icon: Icons.email,
+                      obscureText: false,
+                      keyboardType: TextInputType.emailAddress),
+                  textFields(
+                      label: 'Username',
+                      controller: userNameController,
+                      validation: 'User name',
+                      // icon: Icons.person,
+                      obscureText: false,
+                      keyboardType: TextInputType.text),
+                  textFields(
+                      label: 'Password',
+                      controller: passwordController,
+                      validation: 'password',
+                      //  icon: Icons.password,
+                      obscureText: true),
+                  textFields(
+                      label: 'Confirm Password',
+                      controller: confirmPasswordController,
+                      validation: 'confirmed password',
+                      // icon: Icons.password,
+                      obscureText: true,
+                      textInputAction: TextInputAction.done),
+                       
+                      Row(
+                       
+                        children: [
+                          const Padding(padding: EdgeInsets.fromLTRB(40.0, 60.0, 0.0, 0.0)), 
+                          Container(width: 200,),
+                          ElevatedButton( style: ButtonStyle (
+                            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                                side: BorderSide(color: Colors.grey)
+                              )
+                            )
+                          ),
+                            
+                                                          onPressed: () {
+                                      if (formKey.currentState!.validate()) {
+                                                                 
+                                        users.add(User(
+                                            userNameController.text,
+                                            emailController.text,
+                                            passwordController.text,
+                                            //confirmPasswordController.text
+                                            ));
                           
-              ],
+                                        // to reset all text controllers
+                                        userNameController.clear();
+                                        emailController.clear();
+                                        passwordController.clear();
+                                        confirmPasswordController.clear();
+                                      }
+                                    },
+                                    child: Text('Sigen UP')),
+                        ],
+                      ),
+                            
+                ],
+              ),
             ),
           ),
         ),
@@ -112,8 +132,15 @@ class MyApp extends StatelessWidget {
                autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value) {
               if (value == '') {
+                return " $validation is required!";
+              }
+              else if(keyboardType == TextInputType.emailAddress && !isEmailValid(value.toString())){
                 return "Please enter a valied $validation";
-              } else {
+              }
+              else if(validation == 'confirmed password' && !isPasswordConfirmed(passwordController.text, value.toString())){
+                return "Please enter a $validation";
+              }
+               else {
                 return null;
               }
             },
@@ -129,5 +156,18 @@ class MyApp extends StatelessWidget {
         ))
       ],
     );
+  }
+
+  bool isEmailValid(String email) {
+    return RegExp(r'^[\w-\.]+@[a-zA-Z]+\.[a-zA-Z]{2,}$').hasMatch(email);
+  }
+
+   bool isPasswordConfirmed(String password, String cPassword) {
+     if(password == cPassword){
+      return true;
+    }
+    else{
+      return false;
+    }
   }
 }
